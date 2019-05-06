@@ -16,7 +16,7 @@
                  method="POST"><br/>
                Nome: <input type="text" name="nome" /> <br/>
                E-mail: <input type="text" name="email" /> <br/>
-               Senha: <input type="text" name="senha" /> <br/>
+               Senha: <input type="password" name="senha" /> <br/>
                <input type="reset" value="Limpar"/> <br/>
                <input type="submit" value="Salvar"/> <br/>
            </form>           
