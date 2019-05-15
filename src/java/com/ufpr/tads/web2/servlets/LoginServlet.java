@@ -5,13 +5,23 @@
  */
 package com.ufpr.tads.web2.servlets;
 
+import com.ufpr.tads.tcc.exceptions.UsuarioSenhaInvalidosException;
+import com.ufpr.tads.web2.beans.Usuario;
+import com.ufpr.tads.web2.facade.ClienteFacade;
+import com.ufpr.tads.web2.facade.UsuarioFacade;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.sql.SQLException;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  *
@@ -32,17 +42,109 @@ public class LoginServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet LoginServlet</title>");            
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet LoginServlet at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
+
+
+        String acao = request.getParameter("action");
+        if (acao == null || acao.equals("login")) {
+            String email = request.getParameter("email");
+            String senha = request.getParameter("senha");
+            StringBuffer hexString = new StringBuffer();
+            MessageDigest md;
+            try {
+                md = MessageDigest.getInstance("MD5");
+                byte[] hash = md.digest(senha.getBytes("UTF-8"));
+                for (int i = 0; i < hash.length; i++) {
+                    if ((0xff & hash[i]) < 0x10) {
+                        hexString.append("0"
+                                + Integer.toHexString((0xFF & hash[i])));
+                    } else {
+                        hexString.append(Integer.toHexString(0xFF & hash[i]));
+                    }
+                }
+            } catch (NoSuchAlgorithmException | UnsupportedEncodingException ex) {
+                request.setAttribute("javax.servlet.jsp.jspException", ex);
+                request.setAttribute("javax.servlet.error.status_code", 500);
+                RequestDispatcher rd = getServletContext().getRequestDispatcher("/erro.jsp");
+                rd.forward(request, response);
+            }
+
+            Usuario usuario = new Usuario();
+
+            try {
+                usuario = UsuarioFacade.buscarUsuarioByEmail(email);
+            } catch (SQLException | ClassNotFoundException ex) {
+                request.setAttribute("javax.servlet.jsp.jspException", ex);
+                request.setAttribute("javax.servlet.error.status_code", 500);
+                RequestDispatcher rd = getServletContext().getRequestDispatcher("/erro.jsp");
+                rd.forward(request, response);
+            }
+            try {
+                if (usuario != null && usuario.getEmail().equals(email) && usuario.getSenha().equals(hexString.toString())) {
+                    Usuario us = new Usuario();
+                    us.setId(usuario.getId());
+                    us.setEmail(usuario.getEmail());
+                    us.setTipo(usuario.getTipo());
+                    us.setIdReferencia(usuario.getIdReferencia());
+                    String nome             = "";
+                    String redirecionamento   = "";
+                    try {
+                        switch (us.getTipo()) {
+
+                            case "c" :
+                                nome                = ClienteFacade.buscarNomePorId(us.getIdReferencia());
+                                redirecionamento    = "/portal.jsp";
+                                break; /*
+                            case "g" : 
+                                nome                = OrganizadorFacade.buscarNomePorId(us.getIdReferencia());
+                                redirecionamento    = "/EventoServlet?action=list";
+                                break;
+                            case "f" :
+                                nome = CompradorFacade.buscarNomePorId(us.getIdReferencia());
+                                redirecionamento    = "/EventoServlet?action=list";
+                                break;*/
+                                /*       case "o" : 
+                                nome                = OrganizadorFacade.buscarNomePorId(us.getIdReferencia());
+                                redirecionamento    = "/EventoServlet?action=list";
+                                break;
+                            case "c" :
+                                nome = CompradorFacade.buscarNomePorId(us.getIdReferencia());
+                                redirecionamento    = "/EventoServlet?action=list";
+                                break;*/
+
+                        }
+                    } catch (SQLException | ClassNotFoundException ex) {
+                        request.setAttribute("javax.servlet.jsp.jspException", ex);
+                        request.setAttribute("javax.servlet.error.status_code", 500);
+                        RequestDispatcher rd = getServletContext().getRequestDispatcher("/erro.jsp");
+                        rd.forward(request, response);
+                    }
+                    HttpSession session = request.getSession();
+                    session.setAttribute("usuario", us);
+                    session.setAttribute("nome", nome);
+                    RequestDispatcher rd = getServletContext().getRequestDispatcher(redirecionamento);
+                    rd.forward(request, response);
+
+                } else {
+                    throw new UsuarioSenhaInvalidosException("Usuário/Senha inválidos.");
+                }
+            } catch (UsuarioSenhaInvalidosException ex) {
+                request.setAttribute("msg", ex.getMessage());
+
+                RequestDispatcher rd = getServletContext().getRequestDispatcher("/index.jsp");
+                rd.forward(request, response);
+            }
+        
+        } else if (acao.equals("logout")) {
+            HttpSession session = request.getSession(false);
+
+            if (session != null) {
+                session.invalidate();
+            }
+
+            request.setAttribute("msg", "Usuário desconectado com sucesso");
+
+            RequestDispatcher rd = getServletContext().getRequestDispatcher("/index.jsp");
+            rd.forward(request, response);
         }
     }
 

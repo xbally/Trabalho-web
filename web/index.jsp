@@ -60,7 +60,7 @@
                     </div>
                 </c:if>
                   
-    <form action="LoginServlet?action=login" method="POST">
+<form action="LoginServlet?action=login" method="POST">
 	<div class="limiter">
 		<div class="container-login100" style="background-image: url('images/bg-01.jpg');">
 			<div class="wrap-login100">
@@ -74,12 +74,14 @@
 					</span>
 
 					<div class="wrap-input100 validate-input" data-validate = "Enter email">
-                                            <input class="input100" type="text" id="email" name="email" value="" placeholder="Email">
+                                            <input class="input100"  id="email" type="email" name="email" value="" placeholder="E-mail" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Login'">
 						<span class="focus-input100" data-placeholder="&#xf207;"></span>
 					</div>
-
+                                            
+                                    
+                                                                         
 					<div class="wrap-input100 validate-input" data-validate="Enter password">
-						<input class="input100" type="password" id="password" name="senha" value=""  placeholder="Senha">
+						<input class="input100" id="senha" type="password" name="senha" value="" placeholder="Senha" onfocus="this.placeholder = ''"  onblur="this.placeholder = 'Senha'" >
 						<span class="focus-input100" data-placeholder="&#xf191;"></span>
 					</div>
 
@@ -99,14 +101,14 @@
 							Forgot Password?
 						</a>
 					</div>
+                                
                                     
-                                    <div class="text-center p-t-90"><a  href="CadastrarServlet?action=formNew">cadatrar-se</a></div>
-				</form>
+				
 			</div>
 		</div>
 	</div>
-</form>	
-
+ </form>
+                            <div class="text-center p-t-90"><a  href="CadastrarServlet?action=formNew">cadatrar-se</a></div>
         <footer>
             <p class="small font-weight-light">Em caso de problemas contactar o administrador: <strong><c:out value="${configuracao.email}" /></strong></p> 
         </footer>
@@ -135,4 +137,9 @@
         </footer>-->
 
     </body>
+    
 </html>
+<script>
+    
+            console.log("email");
+</script>

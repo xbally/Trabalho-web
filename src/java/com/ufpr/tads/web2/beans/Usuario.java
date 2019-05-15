@@ -11,15 +11,19 @@ import java.io.Serializable;
  *
  * @author Gabriel
  */
-public class Usuario implements Serializable{
+public class Usuario implements Serializable {
     private int id;
     private String email;
     private String senha;
     private String tipo;
     private boolean ativo;
+    private int idReferencia;
     private Endereco endereco;
-    
-        public Usuario(int id, String email, String senha, String tipo, Endereco endereco) {
+
+    public Usuario() {
+    }
+
+    public Usuario(int id, String email, String senha, String tipo, Endereco endereco) {
         this.id = id;
         this.email = email;
         this.senha = senha;
@@ -59,6 +63,22 @@ public class Usuario implements Serializable{
         this.tipo = tipo;
     }
 
+    public Endereco getEndereco() {
+        return endereco;
+    }
+
+    public int getIdReferencia() {
+        return idReferencia;
+    }
+
+    public void setIdReferencia(int idReferencia) {
+        this.idReferencia = idReferencia;
+    }
+    
+    public void setEndereco(Endereco endereco) {
+        this.endereco = endereco;
+    }
+
     public boolean isAtivo() {
         return ativo;
     }
@@ -66,14 +86,6 @@ public class Usuario implements Serializable{
     public void setAtivo(boolean ativo) {
         this.ativo = ativo;
     }
-
-    public Endereco getEndereco() {
-        return endereco;
-    }
-
-    public void setEndereco(Endereco endereco) {
-        this.endereco = endereco;
-    }
-        
-        
+    
+    
 }

@@ -77,4 +77,6 @@ public class Endereco {
         this.idReferencia = idReferencia;
     }
     
+    
+    
 }
