@@ -5,8 +5,12 @@
  */
 package com.ufpr.tads.web2.facade;
 
+import com.ufpr.tads.web2.beans.Cliente;
 import com.ufpr.tads.web2.dao.ClienteDAO;
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
+import java.util.List;
 
 /**
  *
@@ -14,9 +18,27 @@ import java.sql.SQLException;
  */
 public class ClienteFacade {
     
+    
+    public static List<Cliente> buscarTodosClientes() throws SQLException, ClassNotFoundException {
+        ClienteDAO cliente = new ClienteDAO();
+        return cliente.selectClientes();
+    }
+
+    
     public static String buscarNomePorId(int id) throws SQLException, ClassNotFoundException {
         ClienteDAO cad = new ClienteDAO();
         return cad.selectNameById(id);
+    }
+       
+    public static void inserir(Cliente cliente) throws ClassNotFoundException, SQLException, NoSuchAlgorithmException, UnsupportedEncodingException {
+        ClienteDAO dao = new ClienteDAO();
+        dao.insertCliente(cliente);
+    }
+    
+    
+     public static int buscarIdPorDadosCliente(Cliente cliente) throws SQLException, ClassNotFoundException {
+        ClienteDAO comp = new ClienteDAO();
+        return comp.selectIdByData(cliente);
     }
 
 }
